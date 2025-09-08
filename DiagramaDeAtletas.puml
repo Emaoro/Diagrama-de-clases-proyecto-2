@@ -1,0 +1,105 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam classAttributeIconSive 0
+
+class Persona {
+- nombreCompleto : String
+- edad : int
++ getNombre() : String
++ getEdad() : int
+}
+
+class Atleta {
+- disciplina : Disciplina
+- departamento : String
+- nacionalidad : String
+- fechaDeIngreso : LocalDate
+- sesiones : List<SesionEntrenamiento>
+- entrenamiento : List<Entrenamiento>
++ agregarSesion(s:SesionEntrenamiento) : void
++ listarSesiones() : List<SesionEntrenamiento>
++ mostrarReporte() : void
+}
+
+class SesionEntrenamiento {
+- fecha : LocalDate
+- tipo : String
+- valorRendimiento : double
+- ubicacion : String
+- pais : String
++ detalles() : String
+}
+
+class SescionFactory <<Factory>> {
++ crearSesion(tipo:String, fecha:LocalDate, valor:double, ubicacion:String, pais:String) : SesionEntrenamiento
+}
+
+interface IObserver{
++ actualizar() : void
+}
+
+interface ISubject {
++ agregarObserver(o:IObserver) : void
++ removerObserver(o:IObserver) : void
++ notificarObserver(o:IObserver) : void
+}
+
+class Estadistica <<Observer>> {
++ actualizar() : void
++ calcularPromedio(sesiones:List<SesionEntrenamiento>) : double
++ mejorRendimiento(sesiones:List<SesionEntrenamiento>) : double
++ evolucion(sesiones:List<SesionEntrenamiento>) : List<double>
++ compararNacionalVsInternacional(sesiones:List<SesionEntrenamiento> : Map<String,double>
+}
+
+class Planilla <<Strategy>> {
++ calcularPago(a.Atleta) : double
+}
+
+class Persistencia <<Facade>> {
++ guardarJSON(atletas:List<Atletas>, archivo:String) : void
++ cargarJSON(archivo:String) : List<Atleta>
++ exportarCSV(atletas:List<Atleta>, archivo:String) : void
++ guardarBD(atletas:List<Atleta>) : void
++ cargarBD() : List<Atleta>
+}
+
+class RegistroAtletas <<Singleton, Subject>> {
+- atletas : List<Atleta>
+-observers : List<IObserver>
++ getInstancia() : RegistroAtletas
++ registrarAtleta(a.Atleta) : void
++ registrarSesion(nombre:String, s:SesionEntrenamiento) : void
++ generarEstadisticas(nombre:String) : void
++ procesarPago(nombre:String) : void
++ agregarObserver(o.IObserver) : void
++ removerObserver (o:IObserver) : void
++ notificarObserver() : void
+}
+
+enum Disciplina {
+Atletismo
+Natacion
+Pesas
+Ciclismo
+Boxeo
+Judo
+Futbol
+Basquetbol
+Tenis
+}
+
+Persona <|-- Atleta
+Atleta "1" --> "*" SesionEntrenamiento
+Atleta "1" --> "1" Disciplina
+
+RegistroAtletas ..|> ISubject
+Estadistica ..|> IObserver
+
+RegistroAtletas --> Estadistica : notifica
+RegistroAtletas --> Persistencia
+RegistroAtletas --> SescionFactory : crea
+RegistroAtletas --> Planilla : usa
+
+@enduml
